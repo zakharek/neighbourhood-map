@@ -8,4 +8,4 @@ Info window containing place information pops up when a place gets selected.
 
 This application is responsive i.e. works on mobile devices.
 
-![screenshot](https://github.com/zakharek/neighbourhood-map/blob/master/docs/screenshot.png)
+![screenshot](https://raw.githubusercontent.com/zakharek/neighbourhood-map/master/docs/screenshot.PNG)
