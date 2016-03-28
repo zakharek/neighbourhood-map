@@ -17,6 +17,15 @@ html, body, .container-fluid, .map {
     height: 100%;
 }
 
+.hidden {
+    display: none;
+}
+
+.has-error {
+    color: red;
+    padding: 10px;
+}
+
 #page-content-wrapper {
     padding: none !important;
 }

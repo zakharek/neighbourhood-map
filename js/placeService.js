@@ -1,8 +1,10 @@
 function PlaceService() {
     var placeService = {};
 
-    var mapContainer = document.createElement("div");
-    var service = new google.maps.places.PlacesService(new google.maps.Map(mapContainer));
+    // This is a hack to do place search without having to add map object to the page 
+    var dummyMapContainer = document.createElement("div");
+    var dummyMap = new google.maps.Map(dummyMapContainer);
+    var service = new google.maps.places.PlacesService(dummyMap);
 
     placeService.getPlaces = function (latitude, longitude, radiusMetres, query, callback) {
 

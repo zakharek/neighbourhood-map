@@ -11,21 +11,19 @@ $(function () {
             longitude: place.longitude,
             selected: place.selected,
             content: place.name
-        };
+        }
     };
 
     var GetPlaceViewModel = function (placeData) {
-        var vm = {};
-
-        vm.name = placeData.name;
-        vm.latitude = placeData.geometry.location.lat();
-        vm.longitude = placeData.geometry.location.lng();
-        vm.selected = ko.observable(false);
-
-        return vm;
+        return {
+            name: placeData.name,
+            latitude: placeData.geometry.location.lat(),
+            longitude: placeData.geometry.location.lng(),
+            selected: ko.observable(false)
+        }
     };
 
-    var GetViewModel = function (placesData) {
+    var GetViewModel = function (mapCentreLatitude, mapCentrelongitude, placesData, placeSearchFailed) {
         var vm = {};
 
         var unselectPlaces = function (places) {
@@ -40,11 +38,14 @@ $(function () {
             });
         };
 
+        vm.placeSearchFailed = placeSearchFailed;
+        vm.mapCentreLatitude = mapCentreLatitude;
+        vm.mapCentrelongitude = mapCentrelongitude;
         vm.places = ko.observableArray(placesData.map(GetPlaceViewModel));
         vm.currentFilter = ko.observable("");
         vm.filter = ko.observable("");
         vm.isDesktop = ko.observable(false);
-        vm.menuHidden = ko.observable(false);
+        vm.menuHidden = ko.observable(!placeSearchFailed);
 
         vm.filterPlaces = ko.computed(function () {
             return vm.currentFilter()
@@ -76,8 +77,17 @@ $(function () {
                 vm.menuHidden(true);
             }
         };
+        
+        var layoutInitialised = false;
 
         vm.layoutChanged = function (desktop) {
+            // do not hide menu on init if place search failed 
+            if(!layoutInitialised && placeSearchFailed){
+                vm.menuHidden(false);
+                layoutInitialised = true;
+                return;
+            }
+            
             vm.isDesktop(desktop);
 
             if (desktop) {
@@ -86,20 +96,21 @@ $(function () {
             }
 
             vm.menuHidden(true);
-        }
+        };
 
         vm.toggleSideMenu = function () {
             var hidden = vm.menuHidden();
             vm.menuHidden(!hidden);
-        }
+        };
 
         return vm;
     };
 
     var placesService = PlaceService();
 
-    placesService.getPlaces(MapCentreLatitude, MapCentrelongitude, SearchRadiusMetres, SearchQuery, function (places) {
-        var viewModel = GetViewModel(places);
+    placesService.getPlaces(MapCentreLatitude, MapCentrelongitude, SearchRadiusMetres, SearchQuery, function (places, status) {
+        var placeSearchFailed = status !== google.maps.places.PlacesServiceStatus.OK;
+        var viewModel = GetViewModel(MapCentreLatitude, MapCentrelongitude, places, placeSearchFailed);
         ko.applyBindings(viewModel);
     });
 });

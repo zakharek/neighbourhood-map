@@ -1,3 +1,4 @@
+/* Google maps custom binding */
 ko.bindingHandlers.map = function () {
     var _mapBinding = {},
         _infoWindow,
@@ -5,6 +6,9 @@ ko.bindingHandlers.map = function () {
         _mapBounds,
         _map,
         _defaultAnimation = google.maps.Animation.BOUNCE;
+
+    var defaultZoomLevel = 14;
+    var maxZoomLevel = 20;
 
     var clearMarkers = function () {
         for (var i = 0; i < _mapMarkers.length; i++) {
@@ -15,7 +19,7 @@ ko.bindingHandlers.map = function () {
     };
 
     var startBouncing = function (marker) {
-
+        // stop animation for all markers except selected
         for (var i = 0; i < _mapMarkers.length; i++) {
             if (marker !== _mapMarkers[i]) {
                 _mapMarkers[i].setAnimation(null);
@@ -40,9 +44,11 @@ ko.bindingHandlers.map = function () {
     }
 
     var resizeMap = function () {
-        _map.setOptions({ maxZoom: 14 });
+        // prevent zooming too much when fitting bounds
+        _map.setOptions({ maxZoom: defaultZoomLevel });
         _map.fitBounds(_mapBounds);
-        _map.setOptions({ maxZoom: 20 });
+        // revert zoom restriction so user can zoom in more
+        _map.setOptions({ maxZoom: maxZoomLevel });
     };
 
     var openInfoWindow = function (mapMarker, marker) {
@@ -57,8 +63,9 @@ ko.bindingHandlers.map = function () {
         }
     };
 
-    var updateViewModel = function (markers, marker) {
+    var selectMarkerViewModel = function (marker, markers) {
         for (var j = 0; j < markers.length; j++) {
+            // unselect all markers except selected
             if (marker !== markers[j]) {
                 markers[j].selected(false);
             }
@@ -85,14 +92,14 @@ ko.bindingHandlers.map = function () {
 
             mapMarker.addListener('click', function (mm, m) {
                 return function () {
-                    updateViewModel(markers, m);
+                    selectMarkerViewModel(m, markers);
                 }
             }(mapMarker, markers[i]));
 
             markers[i].selected.subscribe(function (mm, m) {
                 return function (selected) {
                     if (selected) {
-                        updateViewModel(markers, m);
+                        selectMarkerViewModel(m, markers);
                         openInfoWindow(mm, m);
                         startBouncing(mm);
                     }
@@ -112,9 +119,14 @@ ko.bindingHandlers.map = function () {
 
     _mapBinding.init = function (element, valueAccessor) {
         var mapObject = valueAccessor(),
-            markers = mapObject.markers();
+            markers = ko.unwrap(mapObject.markers),
+            lat = ko.unwrap(mapObject.lat),
+            lng = ko.unwrap(mapObject.lng);
 
-        _map = new google.maps.Map(element);
+        _map = new google.maps.Map(element, {
+            center: {lat: lat, lng: lng},
+            zoom: defaultZoomLevel
+        });
 
         placeMarkers(markers);
     };
@@ -129,21 +141,22 @@ ko.bindingHandlers.map = function () {
     return _mapBinding;
 }();
 
-
+/* Media query custom binding */
 ko.bindingHandlers.media = function () {
     var _mediaBinding = {};
 
     _mediaBinding.init = function (element, valueAccessor) {
-        var mediaObject = valueAccessor();
-        var mediaQuery = mediaObject.query;
+        var mediaObject = valueAccessor(), 
+            mediaQuery = mediaObject.query,
+            mq = window.matchMedia(mediaQuery);
 
-        var mq = window.matchMedia(mediaQuery);
-
-        mediaObject.changed(mq.matches);
-
+        // changed event is triggered every time media query is applied or unapplied
         mq.addListener(function () {
             mediaObject.changed(mq.matches);
         });
+        
+        // trigger changed event initially to notify of currently applied media query
+        mediaObject.changed(mq.matches);
     };
 
     return _mediaBinding;
