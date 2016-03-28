@@ -1,0 +1,216 @@
+/*!
+ * Inspired by - Start Bootstrap - Simple Sidebar HTML Template (http://startbootstrap.com)
+*/
+
+html {
+    overflow-x: hidden;
+}
+
+html, body, .container-fluid, .map {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.content, .content-row, #page-content-wrapper, .container-fluid, #container-fluid, #wrapper {
+    height: 100%;
+}
+
+#page-content-wrapper {
+    padding: none !important;
+}
+
+.map {
+    position: relative;
+}
+
+.btn-filter {
+    float: left;
+}
+
+#wrapper {
+    padding-left: 0;
+    -webkit-transition: all 0.5s ease;
+    -moz-transition: all 0.5s ease;
+    -o-transition: all 0.5s ease;
+    transition: all 0.5s ease;
+}
+
+#sidebar-wrapper {
+    z-index: 999;
+    position: fixed;
+    left: 250px;
+    width: 250px;
+    height: 100%;
+    margin-left: -250px;
+    overflow-y: auto;
+    background: #000;
+    -webkit-transition: all 0.5s ease;
+    -moz-transition: all 0.5s ease;
+    -o-transition: all 0.5s ease;
+    transition: all 0.5s ease;
+}
+
+#page-content-wrapper {
+    width: 100%;
+    position: absolute;
+}
+
+/* Sidebar Styles */
+
+.sidebar-nav {
+    position: absolute;
+    width: 250px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+    .sidebar-nav li {
+        text-indent: 20px;
+        line-height: 40px;
+    }
+
+        .sidebar-nav li a {
+            display: block;
+            text-decoration: none;
+            color: #999999;
+        }
+
+            .sidebar-nav li a:hover {
+                text-decoration: none;
+                color: #fff;
+                background: rgba(255,255,255,0.2);
+            }
+
+            .sidebar-nav li a:active,
+            .sidebar-nav li a:focus {
+                text-decoration: none;
+            }
+
+    .sidebar-nav > .sidebar-brand {
+        height: 65px;
+        font-size: 18px;
+        line-height: 60px;
+    }
+
+        .sidebar-nav > .sidebar-brand a {
+            color: #999999;
+        }
+
+            .sidebar-nav > .sidebar-brand a:hover {
+                color: #fff;
+                background: none;
+            }
+
+.filter {
+    position: fixed;
+    z-index: 1000;
+    background: black;
+    border-bottom: solid 1px #222;
+    width: 240px;
+    overflow: hidden;
+    -webkit-transition: all 0.5s ease;
+    -moz-transition: all 0.5s ease;
+    -o-transition: all 0.5s ease;
+    transition: all 0.5s ease;
+}
+
+#sidebar-wrapper {
+    overflow-x: hidden;
+    box-shadow: 2px 2px 2px rgba(0,0,0,0.2);
+}
+
+.place-link {
+    padding: 8px 20px 8px 15px;
+}
+
+.places {
+    padding-bottom: 4em;
+}
+
+    .places li {
+        text-indent: 0;
+        line-height: inherit;
+    }
+
+.selected {
+    text-decoration: none;
+    color: #fff;
+    background: rgba(255,255,255,0.2);
+}
+
+.places-section {
+    margin-top: 56px;
+}
+
+.mobile-menu {
+    position: relative;
+}
+
+    .mobile-menu #menu-toggle {
+        text-align: right;
+    }
+
+.input-group {
+    padding: 10px;
+    padding-right: 15px;
+}
+
+.filter.input-group {
+    padding-left: 10px;
+}
+
+#wrapper.toggled {
+    padding-left: 0;
+}
+
+    #wrapper.toggled #sidebar-wrapper {
+        width: 4px;
+    }
+
+    #wrapper.toggled #page-content-wrapper {
+        position: absolute;
+        margin-right: -250px;
+    }
+
+    #wrapper.toggled .filter {
+        width: 0;
+    }
+
+    #wrapper.toggled #menu-toggle {
+        margin-left: 0;
+    }
+
+#menu-toggle {
+    position: fixed;
+    top: 47%;
+    left: 0;
+    z-index: 998;
+    margin-left: 246px;
+    display: block;
+    -webkit-transition: all 0.5s ease;
+    -moz-transition: all 0.5s ease;
+    -o-transition: all 0.5s ease;
+    transition: all 0.5s ease;
+    text-shadow: 2px 2px 2px rgba(0,0,0,0.2);
+}
+
+@media(min-width:768px) {
+    #menu-toggle {
+        display: none;
+    }
+
+    #wrapper {
+        padding-left: 250px;
+    }
+
+    #sidebar-wrapper {
+        width: 250px;
+    }
+
+    #page-content-wrapper {
+        position: relative;
+    }
+}

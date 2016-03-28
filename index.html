@@ -1,0 +1,65 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Sydney Dental Clinics</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link href="css/main.css" rel="stylesheet">
+    <link href="css/icons.css" rel="stylesheet">
+</head>
+
+<body data-bind="media: {query: 'screen and (min-width:768px)', changed: layoutChanged}">
+
+    <div id="wrapper" data-bind="css:{toggled: menuHidden}">
+
+        <i class="icon" id="menu-toggle" data-bind="click: toggleSideMenu, css: {'icon-collapse-right': menuHidden, 'icon-collapse-left': menuShown}"></i>
+
+        <div id="sidebar-wrapper">
+            <div class="filter">
+                <div class="input-group">
+                    <input data-bind="value: filter" type="text" class="form-control" placeholder="Filter list...">
+                    <span class="input-group-btn">
+                        <button data-bind="click: doFilter" class="btn btn-default btn-filter" type="submit">Go</button>
+                    </span>
+                </div>
+            </div>
+            <div class="places-section">
+                <ul class="sidebar-nav  places" data-bind="foreach: filterPlaces">
+                    <li>
+                        <a class="place-link" href="#" data-bind="text: name, click: $root.selectPlace, css: {selected: selected}"></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="page-content-wrapper">
+            <div class="container-fluid">
+                <div class="row content-row">
+                    <div class="col-lg-12 content">
+                        <div class="map" data-bind="map: { markers: markers }"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-1.12.2.min.js" integrity="sha256-lZFHibXzMHo3GGeehn1hudTAP3Sc0uKXBXAzHX1sjtk=" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.0/knockout-debug.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC3gvSRc2o10b0ucpZ9eT3ZfIaaDz0wLqY&libraries=places"></script>
+
+    <script src="js/placeService.js"></script>
+    <script src="js/customBindings.js"></script>
+    <script src="js/app.js"></script>
+
+</body>
+
+</html>
