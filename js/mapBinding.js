@@ -1,11 +1,15 @@
 /* Google maps custom binding */
-ko.bindingHandlers.map = function () {
+ko.bindingHandlers.map = (function () {
     var _mapBinding = {},
         _infoWindow,
         _mapMarkers = [],
         _mapBounds,
         _map,
-        _defaultAnimation = google.maps.Animation.BOUNCE;
+        _getInfoWindowContent,
+        _defaultContent,
+        _subscribedToMarkers = [],
+        _subscriptions = [],
+        _defaultAnimation;
 
     var defaultZoomLevel = 14;
     var maxZoomLevel = 20;
@@ -18,7 +22,7 @@ ko.bindingHandlers.map = function () {
         _mapMarkers = [];
     };
 
-    var startBouncing = function (marker) {
+    var selectMapMarker = function (marker) {
         // stop animation for all markers except selected
         for (var i = 0; i < _mapMarkers.length; i++) {
             if (marker !== _mapMarkers[i]) {
@@ -33,15 +37,15 @@ ko.bindingHandlers.map = function () {
 
     var isBouncing = function (marker) {
         return marker.getAnimation() === _defaultAnimation;
-    }
+    };
 
     var isMarkerInBounds = function (marker) {
         return _map.getBounds().contains(marker.getPosition());
-    }
+    };
 
     var allMarkersAreVisible = function () {
         return _mapMarkers.filter(function (m) { return isMarkerInBounds(m); }).length === _mapMarkers.length;
-    }
+    };
 
     var resizeMap = function () {
         // prevent zooming too much when fitting bounds
@@ -51,16 +55,20 @@ ko.bindingHandlers.map = function () {
         _map.setOptions({ maxZoom: maxZoomLevel });
     };
 
-    var openInfoWindow = function (mapMarker, marker) {
-        if (_infoWindow) _infoWindow.close();
-
-        if (marker.content) {
-            _infoWindow = new google.maps.InfoWindow({
-                content: marker.content
-            });
-
-            _infoWindow.open(_map, mapMarker);
+    var showPlaceInfo = function (mapMarker, marker) {
+        if (_infoWindow) {
+            _infoWindow.close();
         }
+
+        _infoWindow = new google.maps.InfoWindow({
+            content: _defaultContent
+        });
+
+        _infoWindow.open(_map, mapMarker);
+
+        _getInfoWindowContent(marker, function (content) {
+            _infoWindow.setContent(content);
+        });
     };
 
     var selectMarkerViewModel = function (marker, markers) {
@@ -72,13 +80,59 @@ ko.bindingHandlers.map = function () {
         }
 
         marker.selected(true);
-    }
+    };
+
+    var removeExistingSubscription = function (marker) {
+        var markerIndex = _subscribedToMarkers.indexOf(marker);
+
+        if (markerIndex === -1) {
+            return;
+        }
+
+        var markerSubscription = _subscriptions[markerIndex];
+
+        if (markerSubscription) {
+            markerSubscription.dispose();
+        }
+    };
+
+    var recordNewSubscription = function (marker, subscription) {
+
+        if (_subscribedToMarkers.indexOf(marker) === -1) {
+            _subscribedToMarkers.push(marker);
+        }
+
+        var markerIndex = _subscribedToMarkers.indexOf(marker);
+        _subscriptions[markerIndex] = subscription;
+    };
+
+    var getMarkerClickHandler = function (marker, allMarkers) {
+        return function () {
+            selectMarkerViewModel(marker, allMarkers);
+        };
+    };
+
+    var getSelectedStateChangedHandler = function (mapMarker, marker, markers) {
+        return function (selected) {
+            if (selected) {
+                selectMarkerViewModel(marker, markers);
+                showPlaceInfo(mapMarker, marker);
+                selectMapMarker(mapMarker);
+            }
+
+            if (!allMarkersAreVisible()) {
+                resizeMap();
+            }
+        };
+    };
 
     var placeMarkers = function (markers) {
 
         clearMarkers();
 
-        if (!markers.length) return;
+        if (!markers.length) {
+            return;
+        }
 
         _mapBounds = new google.maps.LatLngBounds();
 
@@ -90,25 +144,13 @@ ko.bindingHandlers.map = function () {
                 map: _map
             });
 
-            mapMarker.addListener('click', function (mm, m) {
-                return function () {
-                    selectMarkerViewModel(m, markers);
-                }
-            }(mapMarker, markers[i]));
+            mapMarker.addListener('click', getMarkerClickHandler(markers[i], markers));
 
-            markers[i].selected.subscribe(function (mm, m) {
-                return function (selected) {
-                    if (selected) {
-                        selectMarkerViewModel(m, markers);
-                        openInfoWindow(mm, m);
-                        startBouncing(mm);
-                    }
+            removeExistingSubscription(markers[i]);
 
-                    if (!allMarkersAreVisible()) {
-                        resizeMap();
-                    }
-                }
-            }(mapMarker, markers[i]));
+            var subscription = markers[i].selected.subscribe(getSelectedStateChangedHandler(mapMarker, markers[i], markers));
+
+            recordNewSubscription(markers[i], subscription);
 
             _mapMarkers.push(mapMarker);
             _mapBounds.extend(mapMarker.position);
@@ -123,8 +165,12 @@ ko.bindingHandlers.map = function () {
             lat = ko.unwrap(mapObject.lat),
             lng = ko.unwrap(mapObject.lng);
 
+        _defaultAnimation = google.maps.Animation.BOUNCE;
+        _getInfoWindowContent = ko.unwrap(mapObject.getInfoWindowContent);
+        _defaultContent = ko.unwrap(mapObject.defaultContent);
+
         _map = new google.maps.Map(element, {
-            center: {lat: lat, lng: lng},
+            center: { lat: lat, lng: lng },
             zoom: defaultZoomLevel
         });
 
@@ -139,25 +185,4 @@ ko.bindingHandlers.map = function () {
     };
 
     return _mapBinding;
-}();
-
-/* Media query custom binding */
-ko.bindingHandlers.media = function () {
-    var _mediaBinding = {};
-
-    _mediaBinding.init = function (element, valueAccessor) {
-        var mediaObject = valueAccessor(), 
-            mediaQuery = mediaObject.query,
-            mq = window.matchMedia(mediaQuery);
-
-        // changed event is triggered every time media query is applied or unapplied
-        mq.addListener(function () {
-            mediaObject.changed(mq.matches);
-        });
-        
-        // trigger changed event initially to notify of currently applied media query
-        mediaObject.changed(mq.matches);
-    };
-
-    return _mediaBinding;
-}();
+} ());

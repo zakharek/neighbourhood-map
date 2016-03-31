@@ -1,18 +1,15 @@
-$(function () {
+var googleMapError = function () {
+    $(".google-maps-load-error").show();
+};
 
-    var MapCentreLatitude = -33.862856,
+var initMap = function () {
+        var MapCentreLatitude = -33.862856,
         MapCentrelongitude = 151.210482,
         SearchRadiusMetres = 30000,
-        SearchQuery = 'dental clinic';
-
-    var GetMarker = function (place) {
-        return {
-            latitude: place.latitude,
-            longitude: place.longitude,
-            selected: place.selected,
-            content: place.name
-        }
-    };
+        SearchQuery = 'dental clinic',
+        Country = 'AU',
+        City = 'Sydney',
+        Category = 'health';
 
     var GetPlaceViewModel = function (placeData) {
         return {
@@ -20,11 +17,13 @@ $(function () {
             latitude: placeData.geometry.location.lat(),
             longitude: placeData.geometry.location.lng(),
             selected: ko.observable(false)
-        }
+        };
     };
 
     var GetViewModel = function (mapCentreLatitude, mapCentrelongitude, placesData, placeSearchFailed) {
         var vm = {};
+
+        var yelpService = YelpService();
 
         var unselectPlaces = function (places) {
             for (var i = 0; i < places.length; i++) {
@@ -38,6 +37,28 @@ $(function () {
             });
         };
 
+        // finding the nearest business using naive implementation
+        var getNearestBusiness = function (businesses, markerData) {
+
+            return businesses.slice().sort(function (a, b) {
+                var diffA = Math.abs(a.location.coordinate.latitude - markerData.latitude) + Math.abs(a.location.coordinate.longitude - markerData.longitude);
+                var diffB = Math.abs(b.location.coordinate.latitude - markerData.latitude) + Math.abs(b.location.coordinate.longitude - markerData.longitude);
+
+                return diffA - diffB;
+            })[0];
+        };
+
+        var getPlaceDetails = function (data, markerData) {
+
+            var notAvailable = "n/a";
+
+            /* jshint -W069 */
+            var phone = (data && data.businesses.length) ? getNearestBusiness(data.businesses, markerData)["display_phone"] || notAvailable : notAvailable;
+            /* jshint +W069 */
+
+            return ko.renderTemplateX("placeInfo", { name: markerData.name, phone: phone });
+        };
+
         vm.placeSearchFailed = placeSearchFailed;
         vm.mapCentreLatitude = mapCentreLatitude;
         vm.mapCentrelongitude = mapCentrelongitude;
@@ -46,15 +67,10 @@ $(function () {
         vm.filter = ko.observable("");
         vm.isDesktop = ko.observable(false);
         vm.menuHidden = ko.observable(!placeSearchFailed);
+        vm.defaultContent = ko.renderTemplateX("defaultInfo");
 
-        vm.filterPlaces = ko.computed(function () {
-            return vm.currentFilter()
-                ? getFilteredPlaces()
-                : vm.places();
-        });
-
-        vm.markers = ko.computed(function () {
-            return vm.filterPlaces().map(GetMarker);
+        vm.filteredPlaces = ko.computed(function () {
+            return vm.currentFilter() ? getFilteredPlaces() : vm.places();
         });
 
         vm.menuShown = ko.computed(function () {
@@ -63,13 +79,13 @@ $(function () {
 
         vm.doFilter = function () {
             vm.currentFilter(vm.filter());
-            unselectPlaces(vm.filterPlaces());
+            unselectPlaces(vm.filteredPlaces());
             // force map binding to rerender map markers
             vm.currentFilter.valueHasMutated();
         };
 
         vm.selectPlace = function (place) {
-            var allPlacesExceptSelected = vm.filterPlaces().filter(function (p) { return p != place });
+            var allPlacesExceptSelected = vm.filteredPlaces().filter(function (p) { return p != place; });
             unselectPlaces(allPlacesExceptSelected);
             place.selected(true);
 
@@ -77,17 +93,17 @@ $(function () {
                 vm.menuHidden(true);
             }
         };
-        
+
         var layoutInitialised = false;
 
         vm.layoutChanged = function (desktop) {
-            // do not hide menu on init if place search failed 
-            if(!layoutInitialised && placeSearchFailed){
+            // do not hide menu on init if place search failed
+            if (!layoutInitialised && placeSearchFailed) {
                 vm.menuHidden(false);
                 layoutInitialised = true;
                 return;
             }
-            
+
             vm.isDesktop(desktop);
 
             if (desktop) {
@@ -103,6 +119,19 @@ $(function () {
             vm.menuHidden(!hidden);
         };
 
+        vm.getInfoWindowContent = function (markerData, gotContentCallback) {
+            yelpService
+                .search(markerData.name, City, Country, Category)
+                .done(function (data) {
+                    var content = getPlaceDetails(data, markerData);
+                    gotContentCallback(content);
+                })
+                .fail(function (error) {
+                    var errorContent = ko.renderTemplateX("getPlaceError", { error: error });
+                    gotContentCallback(errorContent);
+                });
+        };
+
         return vm;
     };
 
@@ -113,4 +142,4 @@ $(function () {
         var viewModel = GetViewModel(MapCentreLatitude, MapCentrelongitude, places, placeSearchFailed);
         ko.applyBindings(viewModel);
     });
-});
+};

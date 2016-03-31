@@ -1,0 +1,19 @@
+﻿{
+    "name": "Map",
+    "version": "1.0.6",
+    "author": "Kate Zakharova",
+    "devDependencies": {
+        "gulp": "^3.9.0",
+        "gulp-sequence": "^0.4.4",
+        "gulp-connect": "^2.3.1",
+        "gulp-jshint": "^2.0.0",
+        "gulp-jscs": "^3.0.2",
+        "jshint-stylish": "^2.1.0",
+        "gulp-util": "^3.0.7",
+        "gulp-useref": "^3.0.4",
+        "gulp-csso": "^1.0.1",
+        "gulp-uglify": "^1.5.1",
+        "del": "^2.2.0",
+        "gulp-if": "^2.0.0"
+    }
+}

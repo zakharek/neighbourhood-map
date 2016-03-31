@@ -1,19 +1,27 @@
 /*!
- * Inspired by - Start Bootstrap - Simple Sidebar HTML Template (http://startbootstrap.com)
+ * Sliding menu inspired by - Start Bootstrap - Simple Sidebar HTML Template (http://startbootstrap.com)
 */
 
 html {
     overflow-x: hidden;
 }
 
-html, body, .container-fluid, .map {
+html,
+body,
+.container-fluid,
+.map {
     width: 100%;
     height: 100%;
     margin: 0;
     padding: 0;
 }
 
-.content, .content-row, #page-content-wrapper, .container-fluid, #container-fluid, #wrapper {
+.content,
+.content-row,
+#page-content-wrapper,
+.container-fluid,
+#container-fluid,
+#wrapper {
     height: 100%;
 }
 
@@ -21,9 +29,17 @@ html, body, .container-fluid, .map {
     display: none;
 }
 
-.has-error {
+.has-error,
+.google-maps-load-error {
     color: red;
     padding: 10px;
+}
+
+.google-maps-load-error {
+    display: none;
+    position: fixed;
+    top:45%;
+    z-index:1001;
 }
 
 #page-content-wrapper {
@@ -46,7 +62,13 @@ html, body, .container-fluid, .map {
     transition: all 0.5s ease;
 }
 
-#sidebar-wrapper {
+#page-content-wrapper {
+    width: 100%;
+    position: absolute;
+}
+
+/* Sidebar Styles */
+.sidebar-wrapper {
     z-index: 999;
     position: fixed;
     left: 250px;
@@ -60,13 +82,6 @@ html, body, .container-fluid, .map {
     -o-transition: all 0.5s ease;
     transition: all 0.5s ease;
 }
-
-#page-content-wrapper {
-    width: 100%;
-    position: absolute;
-}
-
-/* Sidebar Styles */
 
 .sidebar-nav {
     position: absolute;
@@ -126,7 +141,7 @@ html, body, .container-fluid, .map {
     transition: all 0.5s ease;
 }
 
-#sidebar-wrapper {
+.sidebar-wrapper {
     overflow-x: hidden;
     box-shadow: 2px 2px 2px rgba(0,0,0,0.2);
 }
@@ -158,7 +173,7 @@ html, body, .container-fluid, .map {
     position: relative;
 }
 
-    .mobile-menu #menu-toggle {
+    .mobile-menu .menu-toggle {
         text-align: right;
     }
 
@@ -175,7 +190,7 @@ html, body, .container-fluid, .map {
     padding-left: 0;
 }
 
-    #wrapper.toggled #sidebar-wrapper {
+    #wrapper.toggled .sidebar-wrapper {
         width: 4px;
     }
 
@@ -188,11 +203,11 @@ html, body, .container-fluid, .map {
         width: 0;
     }
 
-    #wrapper.toggled #menu-toggle {
+    #wrapper.toggled .menu-toggle {
         margin-left: 0;
     }
 
-#menu-toggle {
+.menu-toggle {
     position: fixed;
     top: 47%;
     left: 0;
@@ -207,7 +222,7 @@ html, body, .container-fluid, .map {
 }
 
 @media(min-width:768px) {
-    #menu-toggle {
+    .menu-toggle {
         display: none;
     }
 
@@ -215,7 +230,7 @@ html, body, .container-fluid, .map {
         padding-left: 250px;
     }
 
-    #sidebar-wrapper {
+    .sidebar-wrapper {
         width: 250px;
     }
 
