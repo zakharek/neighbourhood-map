@@ -2,22 +2,21 @@
 <html lang="en">
 
 <head>
+    <title>Sydney Dental Clinics</title>
+    
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Sydney Dental Clinics</title>
-
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-
     <link rel="stylesheet" href="css/styles.css">
 </head>
 
 <body data-bind="media: {query: 'screen and (min-width:768px)', changed: layoutChanged}">
 
-    <div id="wrapper" data-bind="css: {toggled: menuHidden}">
+    <div class="wrapper" data-bind="css: {'wrapper-toggled': menuHidden}">
 
         <i class="menu-toggle icon" data-bind="click: toggleSideMenu, css: {'icon-collapse-right': menuHidden, 'icon-collapse-left': menuShown}"></i>
 
@@ -34,7 +33,7 @@
                 <div class="hidden" data-bind="visible: placeSearchFailed, css: { hidden: !placeSearchFailed, 'has-error': placeSearchFailed }">
                     Place search failed, please refresh the page to try again
                 </div>
-                <ul class="sidebar-nav  places" data-bind="foreach: filteredPlaces, visible: !placeSearchFailed">
+                <ul class="sidebar-nav" data-bind="foreach: filteredPlaces, visible: !placeSearchFailed">
                     <li>
                         <a class="place-link" href="#" data-bind="text: name, click: $root.selectPlace, css: {selected: selected}"></a>
                     </li>
@@ -42,7 +41,7 @@
             </div>
         </div>
 
-        <div id="page-content-wrapper">
+        <div class="page-content-wrapper">
             <div class="container-fluid">
                 <div class="row content-row">
                     <div class="col-lg-12 content">
@@ -79,9 +78,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.0/knockout-debug.js"></script>
     <script src="https://oauth.googlecode.com/svn/code/javascript/oauth.js"></script>
     <script src="https://oauth.googlecode.com/svn/code/javascript/sha1.js"></script>
-
     <script src="js/app.js"></script>
-    
     <script async defer
             onerror="googleMapError()" 
             src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC3gvSRc2o10b0ucpZ9eT3ZfIaaDz0wLqY&libraries=places&callback=initMap"></script>

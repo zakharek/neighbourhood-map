@@ -7,7 +7,6 @@
 
 var config = require('./gulp.config'),
     gulp = require('gulp'),
-
     gulpSequence = require('gulp-sequence'),
     jshint = require('gulp-jshint'),
     jscs = require('gulp-jscs'),
@@ -16,12 +15,16 @@ var config = require('./gulp.config'),
     gulpif = require('gulp-if'),
     uglify = require('gulp-uglify'),
     csso = require('gulp-csso'),
+    csslint = require('gulp-csslint'),
+    html5Lint = require('gulp-html5-lint'),
     del = require('del'),
     colors = util.colors;
 
 gulp.task('default', gulpSequence('lint', 'build'));
 
-gulp.task('lint', function () {
+gulp.task('lint', gulpSequence('lint-js', 'lint-css', 'lint-html'));
+
+gulp.task('lint-js', function () {
     return gulp
         .src(config.jsToInspect)
         .pipe(jshint())
@@ -30,11 +33,22 @@ gulp.task('lint', function () {
         .pipe(jscs.reporter());
 });
 
+gulp.task('lint-css', function () {
+    gulp.src(config.css)
+        .pipe(csslint())
+        .pipe(csslint.reporter());
+});
+
+gulp.task('lint-html', function () {
+    return gulp.src(config.htmlFiles)
+        .pipe(html5Lint());
+});
+
 gulp.task('build', gulpSequence(
     'clean',
     ['html', 'images', 'fonts'],
     'optimise-css-js'
-    ));
+));
 
 gulp.task('clean', function (cb) {
     clean(config.buildDir, cb);
@@ -68,7 +82,7 @@ gulp.task('optimise-css-js', function () {
     info('Copying and optimising main css js');
 
     return gulp
-        .src(config.mainHtml)
+        .src(config.htmlFiles)
         .pipe(useref())
         .pipe(gulpif('*.js', uglify()))
         .pipe(gulpif('*.css', csso()))

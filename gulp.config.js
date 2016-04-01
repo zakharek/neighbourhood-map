@@ -18,7 +18,6 @@ module.exports = {
         'css/**/*.css'
     ],
     fonts: 'fonts/**/*.*',
-    mainHtml: '*.html',
     js: [
         'js/**/*.js',
         'views/js/**/*.js'
